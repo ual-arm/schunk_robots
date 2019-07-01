@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node pkg="schunk_lwa4p"
+        type="poses_summit.py"
+        name="summit_powerball"
+        output="screen"/>
+
+  <node pkg="tf"
+        type="static_transform_publisher"
+        name="map_world_broadcaster"
+        args="1.73 1.46 0 0 0 0 /map /world 100"/>
+
+
+</launch>

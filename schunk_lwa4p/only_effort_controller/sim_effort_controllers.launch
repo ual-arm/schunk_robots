@@ -1,26 +1,23 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="paused" default="false"/>
-  <arg name="gui" default="true" />
-  <arg name="use_sim_time" default="false" />
+  <arg name="gui" default="true"/>
 
   <!-- start gazebo with empty world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="paused" value="$(arg paused)" />
     <arg name="gui" value="$(arg gui)" />
-    <arg name="use_sim_time" value="$(arg use_sim_time)" />
-
   </include>
 
   <!-- send lwa4p urdf to param server -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find schunk_lwa4p)/urdf/robot.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find schunk_lwa4p)/only_effort_controller/robot_effort.urdf.xacro'" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model lwa4p -z 0.01 " respawn="false" output="screen" />
 
   <!-- robot state publisher -->
   <node ns="arm" pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
-      <!--param name="publish_frequency" type="double" value="50.0" /-->
+      <param name="publish_frequency" type="double" value="50.0" />
       <param name="tf_prefix" type="string" value="" />
       <!--remap from="joint_states" to="/arm/joint_states"/-->
   </node>
@@ -31,11 +28,28 @@
 
 
   <!-- controllers -->
-  <rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/arm_controller.yaml" />
+  <!-- effort_controller/JointTrajectoryController -->
+  <!--rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/only_effort_controller/effort_joint_trajectory.yaml" /-->
+
+  <!-- effort_controller/JointPositionController-->
+  <rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/only_effort_controller/effort_controller.yaml" />
+
+  <!-- load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"	output="screen"
+        ns="arm" args="
+                       arm_1_position_controller
+                       arm_2_position_controller
+                       arm_3_position_controller
+                       arm_4_position_controller
+                       arm_5_position_controller
+                       arm_6_position_controller" />
+
   <!--rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/joint_limits.yaml"/-->
 
   <!-- start_controllers -->
   <node ns="arm" name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn joint_state_controller" respawn="false" output="screen"/>
+
+
 
   <!-- control_mode_adapter -->
   <node ns="arm" name="cob_control_mode_adapter_node" pkg="cob_control_mode_adapter" type="cob_control_mode_adapter_node" cwd="node" respawn="false" output="screen"/>

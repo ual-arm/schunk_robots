@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <!-- send urdf to param server -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find schunk_lwa4p)/urdf/robot.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find schunk_lwa4p)/only_effort_controller/robot_effort.urdf.xacro'" />
 
   <!-- robot state publisher -->
   <node ns="arm" pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
@@ -17,8 +17,25 @@
   </node>
 
   <!-- controllers -->
-  <rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/arm_controller.yaml" />
-  <!--rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/joint_limits.yaml" /-->
+  <!-- effort_controller/JointTrajectoryController -->
+  <!--rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/only_effort_controller/effort_joint_trajectory.yaml" /-->
+
+  <!-- effort_controller/JointPositionController-->
+  <rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/only_effort_controller/effort_controller.yaml" />
+
+  <!-- load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"	output="screen"
+        ns="arm" args="
+                       arm_1_position_controller
+                       arm_2_position_controller
+                       arm_3_position_controller
+                       arm_4_position_controller
+                       arm_5_position_controller
+                       arm_6_position_controller" />
+
+
+  <!--rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/arm_controller.yaml" /-->
+  <rosparam ns="arm" command="load" file="$(find schunk_lwa4p)/config/joint_limits.yaml" />
 
   <!-- start_controllers -->
   <node ns="arm" name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn joint_state_controller" respawn="false" output="screen"/>

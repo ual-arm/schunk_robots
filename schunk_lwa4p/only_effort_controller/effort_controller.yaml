@@ -1,0 +1,38 @@
+# .yaml config file
+#
+# The PID gains and controller settings must be saved in a yaml file that gets loaded
+# to the param server via the roslaunch file (robby_arm_control.launch).
+
+## control_mode_adapter
+max_command_silence: 0.5
+
+## joint_state_controller
+joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+# effort_controllers ---------------------------------------
+arm_1_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_1_joint
+  pid: {p: 100.0, i: 1, d: 10.0}
+arm_2_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_2_joint
+  pid: {p: 100.0, i: 1, d: 10.0}
+arm_3_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_3_joint
+  pid: {p: 100, i: 1, d: 10.0}
+arm_4_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_4_joint
+  pid: {p: 100, i: 1, d: 10.0}
+arm_5_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_5_joint
+  pid: {p: 100, i: 1, d: 10.0}
+arm_6_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: arm_6_joint
+  pid: {p: 100, i: 1, d: 10.0}
